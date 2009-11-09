@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Winkle Version="1.0">
+  <StableVersions>
+    <StableVersion>
+      <Major>1</Major>
+      <Minor>1</Minor>
+      <Build>99</Build>
+      <Revision>3</Revision>
+      <Patchlevel>0</Patchlevel>
+      <PrettyName>1.0 Release Candidate 1</PrettyName>
+      <UpdateFileUrl>http://bla.de</UpdateFileUrl>
+      <NewInThisVersion>What is new in this version 
+      sfasf
+      
+      asdfasdfasdf
+      sdfasdf
+      asdf
+      -
+      -sdfsdfs</NewInThisVersion>
+    </StableVersion>
+    <StableVersion>
+      <Major>1</Major>
+      <Minor>1</Minor>
+      <Build>99</Build>
+      <Revision>2</Revision>
+      <Patchlevel>0</Patchlevel>
+      <PrettyName>1.0 Release Candidate 0</PrettyName>
+      <UpdateFileUrl>http://bla.de</UpdateFileUrl>
+      <NewInThisVersion>Older version</NewInThisVersion>
+    </StableVersion>
+  </StableVersions>
+</Winkle>

@@ -23,7 +23,7 @@ namespace WinkleExample
         {
             InitializeComponent();
 
-            Winkle.VersionCheck myUpdateChecker = new Winkle.VersionCheck("Desktop Google Reader", "http://tlhan-ghun.de/files/testWinkle2.xml");
+            Winkle.VersionCheck myUpdateChecker = new Winkle.VersionCheck("Desktop Google Reader", "file:///Q:/Dev/GitHub/Winkle/Winkle/WinkleExample/winkleExample.xml");
             Winkle.UpdateInfo myUpdateResponse = myUpdateChecker.checkForUpdate(System.Reflection.Assembly.GetExecutingAssembly(), false);
         }
     }

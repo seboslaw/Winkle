@@ -16,6 +16,7 @@ namespace Winkle
         public bool showWindowIfUpdateAvailable = true;
         private string applicatenName = "";
         private string updateInfoUrl = "";
+        private List<DescriptionOfChanges> changeLog;
 
         public VersionCheck(string appName, string updateUrl)
         {
@@ -41,7 +42,7 @@ namespace Winkle
             {
                 returnCode.errorCode = 1;
                 returnCode.updateInfoRetrievalSuccessfull = false;
-                returnCode.errorTitle = "Retrival of update information failed";
+                returnCode.errorTitle = "Retrieval of update information failed";
                 returnCode.errorDescription = "Cannot download the update file description from " + updateInfoUrl;
                 return returnCode;
             }
@@ -50,6 +51,8 @@ namespace Winkle
             int build = getLatestBuild(includeBetaVersions);
             int revision = getLatestRevision(includeBetaVersions);
 
+            getChangeLog();
+            return returnCode;
             bool updateAvailable = false;
 
             if (currentMajorVersion < major)
@@ -76,13 +79,11 @@ namespace Winkle
                 returnCode.updateMajor = major;
                 returnCode.updateMinor = minor;
                 returnCode.updateBuild = build;
-                returnCode.updateRevision = revision;
-                returnCode.updateDescription = getUpdateDescription(includeBetaVersions);
+                
                 returnCode.manualDownloadUrl = new System.Uri(getDownloadLinkUrl(includeBetaVersions));
 
                 if(showWindowIfUpdateAvailable) {
                     Winkle.UpdateNotification myUpdateNotification = new UpdateNotification();
-                    myUpdateNotification.setDescription(returnCode.updateDescription);
                     myUpdateNotification.setVersion(applicatenName, major.ToString() + "." + minor.ToString() + "." + build.ToString() + "." + revision.ToString());
                     myUpdateNotification.setDownloadLink(returnCode.manualDownloadUrl.ToString());
                     myUpdateNotification.Show();
@@ -117,7 +118,7 @@ namespace Winkle
 
         private int getSingleVersionNumber(string partOfNumber, bool includeBetaVersion)
         {
-            string stringForNumber = WinkleResponse.SelectNodes("Winkle/" + versionToUse + "/" + partOfNumber).Item(0).InnerText;
+            string stringForNumber = WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion/" + partOfNumber).Item(0).InnerText;
             int returnCode = 0;
             try
             {
@@ -132,37 +133,72 @@ namespace Winkle
 
         private string getDownloadLinkUrl(bool includeBetaVersion)
         {
-            return WinkleResponse.SelectNodes("Winkle/" + versionToUse + "/UpdateFileUrl").Item(0).InnerText;
+            return WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion/UpdateFileUrl").Item(0).InnerText;
         }
 
 
         private string getUpdateDescription(bool includeBetaVersion)
         {
-            return WinkleResponse.SelectNodes("Winkle/" + versionToUse + "/NewInThisVersion").Item(0).InnerText;
+            return WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion/NewInThisVersion").Item(0).InnerText;
         }
 
+        private void getChangeLog() {
+            XmlNodeList allChanges = WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion");
+            foreach (XmlNode thisChange in allChanges)
+            {
+                DescriptionOfChanges thisVersion = new DescriptionOfChanges();
+                thisVersion.updateDescription = thisChange["NewInThisVersion"].InnerText;                                                                                              9
+                changeLog.Add(thisVersion);
+            }
+        }
 
         private XmlDocument getUpdateFile(string updateUrl)
         {
-            HttpWebRequest Winkle_Request;
-            HttpWebResponse Winkle_Response = null;
             XmlDocument Winkle_XMLdoc = null;
-            try
-            {
-                Winkle_Request = (HttpWebRequest)WebRequest.Create(string.Format(updateUrl));
-                Winkle_Request.UserAgent = @"Winkle automatic update system " + winkleVersion;
-                Winkle_Response = (HttpWebResponse)Winkle_Request.GetResponse();
-                Winkle_XMLdoc = new XmlDocument();
-                Winkle_XMLdoc.Load(Winkle_Response.GetResponseStream());
+            if(updateUrl.StartsWith("file",true,System.Globalization.CultureInfo.CurrentCulture)) {
+                FileWebRequest Winkle_Request;
+                FileWebResponse Winkle_Response = null;
+                
+                try
+                {
+                    Winkle_Request = (FileWebRequest)WebRequest.Create(string.Format(updateUrl));
+                    //Winkle_Request.UserAgent = @"Winkle automatic update system " + winkleVersion;
+                    Winkle_Response = (FileWebResponse)Winkle_Request.GetResponse();
+                    Winkle_XMLdoc = new XmlDocument();
+                    Winkle_XMLdoc.Load(Winkle_Response.GetResponseStream());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                if (Winkle_Response != null)
+                {
+                    Winkle_Response.Close();
+                }
             }
-            catch (Exception ex)
+            else 
             {
-                Console.WriteLine(ex.Message);
-            }
-            if (Winkle_Response != null)
-            {
-                Winkle_Response.Close();
-            }
+                   HttpWebRequest Winkle_Request;
+                   HttpWebResponse Winkle_Response = null;
+                    
+                    try
+                    {
+                        Winkle_Request = (HttpWebRequest)WebRequest.Create(string.Format(updateUrl));
+                        Winkle_Request.UserAgent = @"Winkle automatic update system " + winkleVersion;
+                        Winkle_Response = (HttpWebResponse)Winkle_Request.GetResponse();
+                        Winkle_XMLdoc = new XmlDocument();
+                        Winkle_XMLdoc.Load(Winkle_Response.GetResponseStream());
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    if (Winkle_Response != null)
+                    {
+                        Winkle_Response.Close();
+                    }
+                }
+        
             return Winkle_XMLdoc;
         }
     }

@@ -17,8 +17,7 @@ namespace Winkle
         public int updateBuild = 0;
         public int updateRevision = 0;
 
-        public string updateName = "";
-        public string updateDescription = "";
+        public List<DescriptionOfChanges> changeLog;
         public System.Uri manualDownloadUrl;
 
         public int errorCode = 0;
