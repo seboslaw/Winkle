@@ -16,7 +16,7 @@ namespace Winkle
         public bool showWindowIfUpdateAvailable = true;
         private string applicatenName = "";
         private string updateInfoUrl = "";
-        private List<DescriptionOfChanges> changeLog;
+        private List<DescriptionOfChanges> changeLog = new List<DescriptionOfChanges>();
 
         public VersionCheck(string appName, string updateUrl)
         {
@@ -51,8 +51,10 @@ namespace Winkle
             int build = getLatestBuild(includeBetaVersions);
             int revision = getLatestRevision(includeBetaVersions);
 
+
+
             getChangeLog();
-            return returnCode;
+           // return returnCode;
             bool updateAvailable = false;
 
             if (currentMajorVersion < major)
@@ -86,6 +88,12 @@ namespace Winkle
                     Winkle.UpdateNotification myUpdateNotification = new UpdateNotification();
                     myUpdateNotification.setVersion(applicatenName, major.ToString() + "." + minor.ToString() + "." + build.ToString() + "." + revision.ToString());
                     myUpdateNotification.setDownloadLink(returnCode.manualDownloadUrl.ToString());
+                    string myDescription = "";
+                    foreach (DescriptionOfChanges myChanges in changeLog) {
+                        myDescription += myChanges.updateDescription;
+                        myDescription += "\n--------\n";
+                    }
+                    myUpdateNotification.setDescription(myDescription);
                     myUpdateNotification.Show();
                 }
 
@@ -147,7 +155,7 @@ namespace Winkle
             foreach (XmlNode thisChange in allChanges)
             {
                 DescriptionOfChanges thisVersion = new DescriptionOfChanges();
-                thisVersion.updateDescription = thisChange["NewInThisVersion"].InnerText;                                                                                              9
+                thisVersion.updateDescription = thisChange["NewInThisVersion"].InnerText;
                 changeLog.Add(thisVersion);
             }
         }

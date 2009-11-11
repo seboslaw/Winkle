@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace WinkleExample
 {
     /// <summary>
@@ -23,8 +24,11 @@ namespace WinkleExample
         {
             InitializeComponent();
 
-            Winkle.VersionCheck myUpdateChecker = new Winkle.VersionCheck("Desktop Google Reader", "file:///Q:/Dev/GitHub/Winkle/Winkle/WinkleExample/winkleExample.xml");
+           // string pathToExampleFile = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "winkleExample.xml";
+
+            Winkle.VersionCheck myUpdateChecker = new Winkle.VersionCheck("Desktop Google Reader", "file:///Q:/Dev/GitHub/Winkle/WinkleExample/winkleExample.xml");
             Winkle.UpdateInfo myUpdateResponse = myUpdateChecker.checkForUpdate(System.Reflection.Assembly.GetExecutingAssembly(), false);
+            Console.WriteLine("bla");
         }
     }
 }
