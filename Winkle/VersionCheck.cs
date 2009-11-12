@@ -25,10 +25,15 @@ namespace Winkle
 
         }
 
+        public UpdateInfo checkForUpdate(Version version, bool includeBetaVersions)
+        {
+            return _doUpdateCheck(version.Major, version.Minor, version.Build, version.Revision, includeBetaVersions);
+        }
+
         public UpdateInfo checkForUpdate(System.Reflection.Assembly assembly, bool includeBetaVersions) {
                 Version v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                
-                return _doUpdateCheck(v.Major, v.Minor, v.Build, v.Revision,false);
+
+                return _doUpdateCheck(v.Major, v.Minor, v.Build, v.Revision, includeBetaVersions);
         }
 
         public UpdateInfo checkForUpdate(int currentMajorVersion, int currentMinorVersion, int currentBuild, int currentRevision, bool includeBetaVersions) {
@@ -86,13 +91,28 @@ namespace Winkle
 
                 if(showWindowIfUpdateAvailable) {
                     Winkle.UpdateNotification myUpdateNotification = new UpdateNotification();
-                    myUpdateNotification.setVersion(applicatenName, major.ToString() + "." + minor.ToString() + "." + build.ToString() + "." + revision.ToString());
+                    
                     myUpdateNotification.setDownloadLink(returnCode.manualDownloadUrl.ToString());
                     string myDescription = "";
+                    Version newestVersion = new Version("0.0.0.0");
+                    
                     foreach (DescriptionOfChanges myChanges in changeLog) {
-                        myDescription += myChanges.updateDescription;
-                        myDescription += "\n--------\n";
+                        if (myChanges.version < newestVersion)
+                        {
+                            myDescription += "New in " + myChanges.getFormattedVersionString() + "\n";
+                            myDescription += myChanges.updateDescription;
+                            myDescription += "\n--------\n";
+                        }
+                        else
+                        {
+                            string tempString = "New in " + myChanges.getFormattedVersionString() + "\n";
+                            tempString += myChanges.updateDescription;
+                            tempString += "\n----------\n";
+                            myDescription = tempString + myDescription;
+                            newestVersion = myChanges.version;
+                        }
                     }
+                    myUpdateNotification.setVersion(applicatenName, newestVersion.ToString());
                     myUpdateNotification.setDescription(myDescription);
                     myUpdateNotification.Show();
                 }
@@ -107,6 +127,34 @@ namespace Winkle
         private int getLatestMajorVersion(bool includeBetaVersion)
         {
             return getSingleVersionNumber("Major", includeBetaVersion);
+        }
+
+        private int getVersion(XmlNode currentNode, string type)
+        {
+            int number = 0;
+            try
+            {
+                number = Convert.ToInt32(currentNode[type].InnerText);
+            }
+            finally
+            {
+               
+            }
+            return number;
+        }
+
+        private string getPrettyName(XmlNode currentNode)
+        {
+            string prettyName = "";
+            try
+            {
+                prettyName = currentNode["PrettyName"].InnerText;
+            }
+            finally
+            {
+
+            }
+            return prettyName;
         }
 
         private int getLatestMinorVersion(bool includeBetaVersion)
@@ -151,12 +199,26 @@ namespace Winkle
         }
 
         private void getChangeLog() {
-            XmlNodeList allChanges = WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion");
-            foreach (XmlNode thisChange in allChanges)
+            try
             {
-                DescriptionOfChanges thisVersion = new DescriptionOfChanges();
-                thisVersion.updateDescription = thisChange["NewInThisVersion"].InnerText;
-                changeLog.Add(thisVersion);
+                XmlNodeList allChanges = WinkleResponse.SelectNodes("Winkle/StableVersions/StableVersion");
+                foreach (XmlNode thisChange in allChanges)
+                {
+                    try
+                    {
+                        DescriptionOfChanges thisVersion = new DescriptionOfChanges();
+                        thisVersion.updateDescription = thisChange["NewInThisVersion"].InnerText;
+                        thisVersion.setVersion(getVersion(thisChange, "Major"), getVersion(thisChange, "Minor"), getVersion(thisChange, "Build"), getVersion(thisChange, "Revision"));
+                        thisVersion.prettyName = getPrettyName(thisChange);
+                        changeLog.Add(thisVersion);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            catch
+            {
             }
         }
 
