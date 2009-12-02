@@ -1,0 +1,19 @@
+Winkle is a .NET based framework to easily integrate an auto-update functionality to you application.
+
+You just need to create a simple XML-file, store it on a webserver and add two lines of code to your project to check for updates.
+
+If updates are available you can choose if you want to get a window opened automatically with a complete changelog shwoing all changes between the currently installed version and the newest version available for download.
+As an alternative you get back an object with all informations included (which is the newest version available, complete changelog as sub-objects and so on) and can create an own display of this information within you application.
+
+See the the included example project to see how to embed Winkle in your project.
+
+As you can see Winkle is currently a 0.x release - so not everyting is done until now but everything what is included in the example works already (and is used by some first projects).
+
+Roadmap:
+ - More stylish update notification window
+ - Optional update notification alerts using Snarl (http://www.fullphat.net/)
+ - Three options for the user if update available:
+  o Open the webpage where the download can be found (already implemented)
+  o Directly download the setup file without user needing to start browser
+  o Incremental exchange only of the files which have been changed
+ - many more options (e. g. you can provide own logo in update notification and so on...)
