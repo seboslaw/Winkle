@@ -16,4 +16,5 @@ Roadmap:
   o Open the webpage where the download can be found (already implemented)
   o Directly download the setup file without user needing to start browser
   o Incremental exchange only of the files which have been changed
- - many more options (e. g. you can provide own logo in update notification and so on...)
+ - Many more options (e. g. you can provide own logo in update notification and so on...)
+ - An editor to easily create the XML-update file
